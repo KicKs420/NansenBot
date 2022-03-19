@@ -7,7 +7,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 import selenium_bot
 
 
-TOKEN = 'OTUxMTM2MjcyOTY4MjE2NjA2.YijErg.09ttinRDFf1IkMGiWKTJfg9cqYM'
+TOKEN = ''
 client = discord.Client()
 
 @client.event

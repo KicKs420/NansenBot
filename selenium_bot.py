@@ -13,7 +13,7 @@ from selenium.webdriver.support import expected_conditions as EC
 def nansen_request(website):
     #variables
     EMAIL_ADDRESS = "justcubesnft@gmail.com"
-    PWD = "#JustCubesBaby69$"
+    PWD = ""
     #login_website = "https://pro.nansen.ai/auth/login"
 
     #open ChromeDriver with GoFullPage Extension
