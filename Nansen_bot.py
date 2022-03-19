@@ -61,5 +61,4 @@ async def on_message(message):
 
     guilds = await client.fetch_guilds(limit=150).flatten()
 
-
 client.run(TOKEN)
