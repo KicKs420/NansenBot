@@ -34,7 +34,13 @@ async def on_message(message):
         if message_str[:1] == '!':
             full_request = str.split(message_str, " ")
             command = full_request[0][1:].lower()
-            contract = full_request[1].lower()
+
+            if len(full_request) == 1:
+                if command == 'help':
+                    await message.reply('To request a Nansen report, specify one of the supported commands (!godmode, !breakdown, !hodlers, !trades, and !rarity) and then the contract address.')
+                    return
+            else:
+                contract = full_request[1].lower()
 
             if command == 'godmode':
                 url = godmode_baseurl + '?nft_address=' + contract
@@ -52,12 +58,22 @@ async def on_message(message):
                 url = godmode_baseurl + '/rarity?nft_address=' + contract
 
             else:
-                await message.channel.send(f'{message_user}, unknown command entered. Currently supported commands are !godmode, !breakdown, !hodlers, !trades, and !rarity. Please try again.')
+                await message.reply(f'Unknown command entered. Currently supported commands are !godmode, !breakdown, !hodlers, !trades, and !rarity. Please try again.')
                 return
 
-            await message.channel.send(f'{message_user}, pulling ' + command + ' for: ' + url)
-            selenium_bot.nansen_request(url)
-            return
+
+            #await message.reply(f'Pulling ' + command + ' report for: ' + contract)
+            website_title = selenium_bot.nansen_request(url, contract)
+
+            if website_title == None or website_title == "NFT God Mode":
+                await message.reply(f'No contract found for ' + contract + '. Please try again.')
+                return
+            else:
+                embed = discord.Embed(title=website_title, description="Report requested: " + command, color=0x00ff00)  # creates embed
+                file = discord.File(contract + ".png", filename=contract + ".png")
+                embed.set_image(url="attachment://image.png")
+                await message.reply(file=file, embed=embed)
+                return
 
     guilds = await client.fetch_guilds(limit=150).flatten()
 
