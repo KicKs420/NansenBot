@@ -9,27 +9,24 @@ from selenium.webdriver.support.relative_locator import locate_with
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import ElementNotVisibleException, ElementNotSelectableException
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver import Chrome, ChromeOptions
+import os
+import time
 
-def nansen_request(website):
+
+def nansen_request(website, contract):
     #variables
     EMAIL_ADDRESS = ""
     PWD = ""
-    #login_website = "https://pro.nansen.ai/auth/login"
+    login_website = "https://pro.nansen.ai/auth/login"
 
-    #open ChromeDriver with GoFullPage Extension
-    chrome_options = Options()
-    chrome_options.add_extension('extension_7_6_0_0.crx')
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()),options=chrome_options)
-
-    #close GoFullPage Extension welcome window
-    windows = driver.window_handles
-    WebDriverWait(driver, 10).until(EC.number_of_windows_to_be(2))
-    driver.close()
-
-    #navigate to requested page (login required)
-    windows = driver.window_handles
-    driver.switch_to.window(windows[0])
-    driver.get(website)
+    #open ChromeDriver to Nansen login page
+    ChromeOptions = Options()
+    ChromeOptions.add_argument("--window-size=1980,1020")
+    ChromeOptions.add_argument("--headless")
+    ChromeOptions.add_argument("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36")
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=ChromeOptions)
+    driver.get(login_website)
 
     #enter email address on login page
     wait = WebDriverWait(driver, 10, poll_frequency=1, ignored_exceptions=[ElementNotSelectableException])
@@ -51,20 +48,26 @@ def nansen_request(website):
 
     #click Sign in button
     button.click()
+    time.sleep(5)
+    driver.get(website)
 
-    delay = wait.until(EC.element_to_be_clickable((By.ID, "nft_tgm_txs_breakdown")))
-    #TransactionsandBuyers = WebDriverWait(driver, timeout=10).until(lambda d: d.find_element(By.ID, "nft_tgm_txs_breakdown"))
+    # pause 5 second to let page loads
+    time.sleep(5)
 
-    #Trying to trigger the GoFullPage Chrome Extension via keyboard shortcut of ALT+SHIFT+P (not working)
-    #webdriver.ActionChains(driver).key_down(Keys.ALT).send_keys("p").key_up(Keys.ALT).key_down(Keys.SHIFT).key_up(Keys.SHIFT).perform()
+    #what if invalid contract or no data?
+    url_title = driver.title
+    #if url_title == "Nansen":
+        #return None
 
-    #Resizing webpage to get full screenshot (not working)
-    S = lambda X: driver.execute_script('return document.body.parentNode.scroll'+X)
-    driver.set_window_size(S('Width'),S('Height')) # May need manual adjustment
-    driver.find_element_by_tag_name('body').screenshot('screenshot.png')
+    #Resizing webpage to get full screenshot
+    ele = driver.find_element(by=By.TAG_NAME, value='html')
+    total_height = ele.size["height"] + 800
+    driver.set_window_size(ele.size["width"], total_height)
+
+    # save screenshot
+    driver.save_screenshot(contract + '.png')
 
     driver.close()
     driver.quit()
 
-
-
+    return url_title
