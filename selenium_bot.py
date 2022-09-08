@@ -60,8 +60,10 @@ def nansen_request(website, contract):
         #return None
 
     #Resizing webpage to get full screenshot
+    Height1 = driver.execute_script("return document.body.scrollHeight")
+    Height2 = driver.execute_script("return document.body.scrollHeight")
     ele = driver.find_element(by=By.TAG_NAME, value='html')
-    total_height = ele.size["height"] + 800
+    total_height = ele.size["height"] + Height1 + Height2
     driver.set_window_size(ele.size["width"], total_height)
 
     # save screenshot
